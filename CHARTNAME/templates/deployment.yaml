@@ -33,18 +33,24 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            {{- include "helpers.list-env-variables" . | indent 12 }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+          {{- if and .Values.probes .Values.probes.livenessPath }}
           livenessProbe:
             httpGet:
-              path: /
+              path: {{ .Values.probes.livenessPath }}
               port: http
+          {{- end }}
+          {{- if and .Values.probes .Values.probes.readinessPath }}
           readinessProbe:
             httpGet:
-              path: /
+              path: {{ .Values.probes.readinessPath }}
               port: http
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

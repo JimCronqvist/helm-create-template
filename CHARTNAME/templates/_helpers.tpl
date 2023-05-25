@@ -60,3 +60,21 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Create a helper to map environment variables, both for sensitive (secrets) and non-sensitive (env vars).
+*/}}
+{{- define "helpers.list-env-variables"}}
+{{- $fullName := include "CHARTNAME.fullname" . -}}
+{{- range $key, $val := .Values.secrets }}
+- name: {{ $key }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ $fullName }}
+      key: {{ $key }}
+{{- end }}
+{{- range $key, $val := .Values.env }}
+- name: {{ $key }}
+  value: {{ $val | quote }}
+{{- end }}
+{{- end }}

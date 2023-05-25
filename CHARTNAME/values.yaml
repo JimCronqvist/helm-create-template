@@ -11,6 +11,7 @@ image:
   tag: ""
 
 imagePullSecrets: []
+
 nameOverride: ""
 fullnameOverride: ""
 
@@ -80,3 +81,15 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+
+# Paths for the probes to do http health checkups against. Set to empty or false to disable the probe.
+probes:
+  livenessPath: /health
+  readinessPath: /health
+
+# Set both normal and secret environment variables
+env: {}
+  # NODE_ENV: production
+secrets:
+  # API_SECRET_KEY: ...
