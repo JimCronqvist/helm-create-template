@@ -1,3 +1,6 @@
+{{- if .Values.ingressroute.enabled -}}
+{{- $fullName := include "CHARTNAME.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -6,24 +9,43 @@ metadata:
     {{- include "CHARTNAME.labels" . | nindent 4 }}
 spec:
   entryPoints:
-  {{- if .Values.ingress.tls }}
+  {{- if .Values.ingressroute.tls.enabled }}
     - websecure
   {{- else }}
     - web
   {{- end }}
   routes:
-  {{- if .Values.ingress.hostname }}
-    - match: Host(`{{ .Values.ingress.hostname }}`) && PathPrefix(`{{ .Values.ingress.path }}`)
-  {{- else }}
-    - match: PathPrefix(`{{ .Values.ingress.path }}`)
-  {{- end }}
-      kind: Rule
+    {{- range .Values.ingressroute.routes }}
+    - kind: Rule
+      priority: {{ .priority | default 0 }}
+      {{- if regexMatch "[+*()\\[\\]{}]" .host }}
+      match: HostRegexp(`{{ .host | replace "," "`,`" }}`) && PathPrefix(`{{ .path }}`)
+      {{- else if .host }}
+      match: Host(`{{ .host | replace "," "`,`" }}`) && PathPrefix(`{{ .path }}`)
+      {{- else }}
+      match: PathPrefix(`{{ .path }}`)
+      {{- end }}
       services:
-        - name: {{ include "CHARTNAME.fullname" . }}
-          port: {{ .Values.service.port }}
-      #middlewares:
-      #  - name: {{ include "CHARTNAME.fullname" . }}
-  {{- if .Values.ingress.tls }}
+        - name: {{ $fullName }}
+          port: {{ $svcPort }}
+          nativeLB: {{ .nativeLB | default false }}
+      middlewares:
+        #- name: {{ $fullName }}-strip
+    {{- end }}
+  {{- if .Values.ingressroute.tls.enabled }}
   tls:
-    stores: default
+    {{- if .Values.ingressroute.tls.certResolver }}
+    certResolver: {{ .Values.ingressroute.tls.certResolver }}
+    {{- end }}
+    {{- if .Values.ingressroute.tls.domains }}
+    domains:
+    {{- range $domain := .Values.ingressroute.tls.domains }}
+      - main: {{ $domain.main }}
+        {{- with $domain.sans }}
+        sans:
+          {{- toYaml $domain.sans | nindent 10 }}
+        {{- end }}
+    {{- end }}
+    {{- end }}
   {{- end }}
+{{- end }}

@@ -31,7 +31,11 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- if and .Values.global .Values.global.versions .Values.global.versions.CHARTNAME }}
+          image: "{{ .Values.image.repository }}:{{ .Values.global.versions.CHARTNAME }}"
+          {{- else }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             {{- include "helpers.list-env-variables" . | indent 12 }}
