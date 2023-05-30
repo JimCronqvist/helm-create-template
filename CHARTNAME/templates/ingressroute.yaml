@@ -1,12 +1,34 @@
 {{- if .Values.ingressroute.enabled -}}
 {{- $fullName := include "CHARTNAME.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
+{{- $labels := include "portal-account.labels" . -}}
+{{- range $index, $route := .Values.ingressroute.routes }}
+{{- if .stripPrefix }}
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ $fullName }}-route{{ $index }}-strip
+  labels:
+    {{- $labels | nindent 4 }}
+spec:
+  {{- if regexMatch "[+*()\\[\\]{}]" .stripPrefix }}
+  stripPrefixRegex:
+    regex:
+      - {{ .stripPrefix | quote }}
+  {{- else }}
+  stripPrefix:
+    prefixes:
+      - {{ .stripPrefix | quote }}
+  {{- end }}
+---
+{{- end }}
+{{- end }}
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: {{ include "CHARTNAME.fullname" . }}
+  name: {{ $fullName }}
   labels:
-    {{- include "CHARTNAME.labels" . | nindent 4 }}
+    {{- $labels | nindent 4 }}
 spec:
   entryPoints:
   {{- if .Values.ingressroute.tls.enabled }}
@@ -15,10 +37,10 @@ spec:
     - web
   {{- end }}
   routes:
-    {{- range .Values.ingressroute.routes }}
+    {{- range $index, $route := .Values.ingressroute.routes }}
     - kind: Rule
       priority: {{ .priority | default 0 }}
-      {{- if regexMatch "[+*()\\[\\]{}]" .host }}
+      {{- if and .host (regexMatch "[+*()\\[\\]{}]" .host) }}
       match: HostRegexp(`{{ .host | replace "," "`,`" }}`) && PathPrefix(`{{ .path }}`)
       {{- else if .host }}
       match: Host(`{{ .host | replace "," "`,`" }}`) && PathPrefix(`{{ .path }}`)
@@ -30,7 +52,9 @@ spec:
           port: {{ $svcPort }}
           nativeLB: {{ .nativeLB | default false }}
       middlewares:
-        #- name: {{ $fullName }}-strip
+        {{- if .stripPrefix }}
+        - name: {{ $fullName }}-route{{ $index }}-strip
+        {{- end }}
     {{- end }}
   {{- if .Values.ingressroute.tls.enabled }}
   tls:

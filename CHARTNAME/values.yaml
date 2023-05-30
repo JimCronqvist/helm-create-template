@@ -53,14 +53,18 @@ ingressroute:
     #      - test.domain.com
   routes:
     # Path is required, and will match against PathPrefix(`...`), with an optional Host() or HostRegexp() match (multiple with commas)
-    # Priority: 0, means the priority will be ignored, and the default traefik rules length sorting is applied.
+    # priority: 0, means the priority will be ignored, and the default traefik rules length sorting is applied.
+    # stripPrefix: {path}, use to remove a base path when the container does not expect it, such as nginx with static files
     #
-    #- host: test.local
-    #  path: /
-    #  priority: 0
-    #- host: test(.*).local
-    #  path: /([0-9]{6,}
-    #  priority: 0
+    # - path: /
+    #   host: test.local
+    #   priority: 0
+    #   stripPrefix:
+    #
+    # - path: /([0-9]{6,}
+    #   host: test(.*).local
+    #   priority: 0
+    #   stripPrefix: /base-path
 
 
 resources: {}
