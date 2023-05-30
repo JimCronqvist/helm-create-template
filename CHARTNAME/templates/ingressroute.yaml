@@ -1,7 +1,7 @@
 {{- if .Values.ingressroute.enabled -}}
 {{- $fullName := include "CHARTNAME.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
-apiVersion: traefik.io/v1alpha1
+apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
   name: {{ include "CHARTNAME.fullname" . }}
