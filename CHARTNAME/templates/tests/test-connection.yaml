@@ -11,5 +11,9 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
+      {{- if and .Values.probes .Values.probes.readinessPath }}
       args: ['{{ include "CHARTNAME.fullname" . }}:{{ .Values.service.port }}{{ .Values.probes.readinessPath }}']
+      {{- else }}
+      args: ['{{ include "CHARTNAME.fullname" . }}:{{ .Values.service.port }}']
+      {{- end }}
   restartPolicy: Never
