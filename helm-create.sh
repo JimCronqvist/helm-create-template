@@ -8,7 +8,7 @@ FOLDER="${2:-generated}"
 if [[ $# -lt 1 ]]; then
     echo "You have not passed any arguments, use this script like this:"
     echo "'bash helm-create.sh <CHARTNAME>'"
-    echo "'bash helm-create.sh <CHARTNAME> ../helm-charts/charts'"
+    echo "'bash helm-create.sh <CHARTNAME> ../helm-charts'"
     echo ""
     exit 1
 fi
