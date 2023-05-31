@@ -1,7 +1,7 @@
 {{- if .Values.ingressroute.enabled -}}
 {{- $fullName := include "CHARTNAME.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
-{{- $labels := include "portal-account.labels" . -}}
+{{- $labels := include "CHARTNAME.labels" . -}}
 {{- range $index, $route := .Values.ingressroute.routes }}
 {{- if .stripPrefix }}
 apiVersion: traefik.containo.us/v1alpha1
