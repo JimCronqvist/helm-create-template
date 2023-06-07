@@ -11,9 +11,13 @@ spec:
   selector:
     matchLabels:
       {{- include "CHARTNAME.selectorLabels" . | nindent 6 }}
-  {{- with .Values.strategy }}
+  {{- if and .Values.strategy .Values.strategy.type }}
   strategy:
-    {{- . | toYaml | nindent 4 }}
+    type: {{ .Values.strategy.type }}
+    {{- if and .Values.strategy.rollingUpdate (eq .Values.strategy.type "RollingUpdate") }}
+    rollingUpdate:
+      {{- .Values.strategy.rollingUpdate | toYaml | nindent 6 }}
+    {{- end }}
   {{- end }}
   template:
     metadata:
