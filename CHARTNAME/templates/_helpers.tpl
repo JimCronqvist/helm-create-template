@@ -94,7 +94,5 @@ Return the Storage Class
   {{- else -}}
     {{- printf "storageClassName: %s" $storageClass -}}
   {{- end -}}
-{{- else -}}
-  {{- printf "storageClassName: null  # Default provisioner used" -}}
 {{- end -}}
 {{- end -}}
