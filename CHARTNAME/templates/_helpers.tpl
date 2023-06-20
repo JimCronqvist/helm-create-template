@@ -78,3 +78,23 @@ Create a helper to map environment variables, both for sensitive (secrets) and n
   value: {{ $val | quote }}
 {{- end }}
 {{- end }}
+
+{{/*
+Return the Storage Class
+{{- include "helpers.storage-class" (dict "persistence" .Values.path.to.the.persistence "global" .Values.global) | nindent 2 }}
+*/}}
+{{- define "helpers.storage-class" -}}
+{{- $storageClass := .persistence.storageClass -}}
+{{- if and .global .global.storageClass -}}
+  {{- $storageClass = .global.storageClass -}}
+{{- end -}}
+{{- if $storageClass -}}
+  {{- if (eq "-" $storageClass) -}}
+    {{- printf "storageClassName: \"\"" -}}
+  {{- else -}}
+    {{- printf "storageClassName: %s" $storageClass -}}
+  {{- end -}}
+{{- else -}}
+  {{- printf "storageClassName: null  # Default provisioner used" -}}
+{{- end -}}
+{{- end -}}

@@ -68,7 +68,7 @@ ingressroute:
     #   priority: 0
     #   stripPrefix:
     #
-    # - path: /([0-9]{6,}
+    # - path: /{path:([0-9]{6,}}
     #   host: test(.*).local
     #   priority: 0
     #   stripPrefix: /base-path
@@ -99,6 +99,14 @@ tolerations: []
 
 affinity: {}
 
+# Format: { volumeName1: { storageClass, size, accessMode, mountPath, ... } }
+pvc: {}
+  # data:
+  #   size: 8Gi
+  #   mountPath: "/mnt/data"
+  #   accessMode: ReadWriteOnce
+  #   # StorageClass: "-" to disable dynamic provisioning, if empty string the default provisioner is used
+  #   storageClass: ""
 
 # Paths for the probes to do http health checkups against. Set to empty or false to disable the probe.
 probes:

@@ -1,7 +1,8 @@
+{{- $fullName := include "CHARTNAME.fullname" . -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "CHARTNAME.fullname" . }}
+  name: {{ $fullName }}
   labels:
     {{- include "CHARTNAME.labels" . | nindent 4 }}
 spec:
@@ -65,6 +66,34 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.pvc }}
+          volumeMounts:
+            {{- range $pvcName, $pvc := . }}
+            - name: {{ $pvcName }}
+              mountPath: {{ $pvc.mountPath | quote }}
+              {{- if $pvc.subPath }}
+              subPath: {{ $pvc.subPath | quote }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+      {{- with .Values.pvc }}
+      volumes:
+        {{- range $pvcName, $pvc := . }}
+        - name: {{ $pvcName }}
+          {{- if .hostPath }}
+          hostPath:
+            {{- toYaml .hostPath | nindent 12 }}
+          {{- else if .emptyDir }}
+          emptyDir:
+            {{- toYaml .emptyDir | nindent 12 }}
+          {{- else if (dig "enabled" true $pvc) }}
+          persistentVolumeClaim:
+            claimName: {{ default (printf "%s-%s" $fullName $pvcName) .existingClaim }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        {{- end }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

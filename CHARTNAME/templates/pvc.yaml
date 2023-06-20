@@ -1,0 +1,23 @@
+{{- if .Values.pvc -}}
+{{- $fullName := include "CHARTNAME.fullname" . -}}
+{{- $labels := include "CHARTNAME.labels" . -}}
+{{- $global := .Values.global -}}
+{{- range $pvcName, $pvc := .Values.pvc }}
+{{- if and (dig "enabled" true $pvc) (not $pvc.existingClaim) -}}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $fullName }}-{{ $pvcName }}
+  labels:
+    {{- $labels | nindent 4 }}
+spec:
+  accessModes:
+    - {{ $pvc.accessMode }}
+  resources:
+    requests:
+      storage: {{ $pvc.size }}
+  {{- include "helpers.storage-class" (dict "persistence" $pvc "global" $global) | nindent 2 }}
+{{- end }}
+{{- end }}
+{{- end }}
