@@ -18,6 +18,7 @@ spec:
     requests:
       storage: {{ $pvc.size }}
   {{- include "helpers.storage-class" (dict "persistence" $pvc "global" $global) | nindent 2 }}
+{{- printf "\n" }}
 {{- end }}
 {{- end }}
 {{- end }}
