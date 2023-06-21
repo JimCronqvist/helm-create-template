@@ -99,14 +99,15 @@ tolerations: []
 
 affinity: {}
 
-# Format: { volumeName1: { storageClass, size, accessMode, mountPath, ... } }
+# Format: { volumeName1: { size, accessMode, storageClass, mounts: [{ mountPath, subPath, [readonly] }, ...], ... } }
 pvc: {}
   # data:
   #   size: 8Gi
-  #   mountPath: "/mnt/data"
   #   accessMode: ReadWriteOnce
   #   # StorageClass: "-" to disable dynamic provisioning, if empty string the default provisioner is used
   #   storageClass: ""
+  #   mounts:
+  #     - mountPath: "/mnt/data"
 
 # Paths for the probes to do http health checkups against. Set to empty or false to disable the probe.
 probes:

@@ -13,7 +13,7 @@ metadata:
     {{- $labels | nindent 4 }}
 spec:
   accessModes:
-    - {{ $pvc.accessMode }}
+    - {{ $pvc.accessMode | default "ReadWriteOnce" }}
   resources:
     requests:
       storage: {{ $pvc.size }}
