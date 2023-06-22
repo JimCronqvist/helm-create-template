@@ -55,11 +55,10 @@ metadata:
     {{- $labels | nindent 4 }}
 spec:
   entryPoints:
-  {{- if .Values.ingressroute.tls.enabled }}
+    {{- if .Values.ingressroute.tls.enabled }}
     - websecure
-  {{- else }}
+    {{- end }}
     - web
-  {{- end }}
   routes:
     {{- range $index, $route := .Values.ingressroute.routes }}
     - kind: Rule
@@ -76,6 +75,9 @@ spec:
           port: {{ $svcPort }}
           nativeLB: {{ .nativeLB | default false }}
       middlewares:
+        {{- if $.Values.ingressroute.tls.enabled }}
+        - name: {{ $fullName }}-redirect-https
+        {{- end }}
         {{- if .rewrite }}
         - name: {{ $fullName }}-route{{ $index }}-rewrite
         {{- else if .stripPrefix }}
