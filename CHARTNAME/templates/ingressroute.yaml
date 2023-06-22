@@ -61,12 +61,13 @@ spec:
     - web
   routes:
     {{- range $index, $route := .Values.ingressroute.routes }}
+    {{- $host := $.Values.ingressroute.overrideHost | default .host }}
     - kind: Rule
       priority: {{ .priority | default 0 }}
-      {{- if and .host (regexMatch "[+*()\\[\\]{}]" .host) }}
-      match: HostRegexp(`{{ .host | replace "," "`,`" }}`) && PathPrefix(`{{ .path }}`)
-      {{- else if .host }}
-      match: Host(`{{ .host | replace "," "`,`" }}`) && PathPrefix(`{{ .path }}`)
+      {{- if and $host (regexMatch "[+*()\\[\\]{}]" $host) }}
+      match: HostRegexp(`{{ $host | replace "," "`,`" }}`) && PathPrefix(`{{ .path }}`)
+      {{- else if $host }}
+      match: Host(`{{ $host | replace "," "`,`" }}`) && PathPrefix(`{{ .path }}`)
       {{- else }}
       match: PathPrefix(`{{ .path }}`)
       {{- end }}
