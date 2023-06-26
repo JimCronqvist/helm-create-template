@@ -114,6 +114,15 @@ probes:
   livenessPath: /health
   readinessPath: /health
 
+cronjobs: []
+  # - name: Cleanup task
+  #   command: "date; echo Completed cleanup task"
+  #   schedule: "* * * * *"
+  #   #timeZone: "Europe/Stockholm"
+  #   #concurrencyPolicy: Forbid
+  #   #suspend: true
+  #   #backoffLimit: 6
+
 # Set both normal and secret environment variables
 env: {}
   # NODE_ENV: production
