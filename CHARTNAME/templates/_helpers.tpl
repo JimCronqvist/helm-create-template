@@ -96,3 +96,69 @@ Return the Storage Class
   {{- end -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Return the Image Tag by using the following order:
+  1. .Values.global.versions.{chartName},
+  2. .Values.image.tag,
+  3. .Chart.AppVersion
+Useage: {{ include "helpers.image-tag" }}
+*/}}
+{{- define "helpers.image-tag" -}}
+{{- dig (.Chart.Name) (.Values.image.tag | default .Chart.AppVersion) ((.Values.global).versions | default dict) }}
+{{- end -}}
+
+{{/*
+Return the Volume Mounts
+{{- with .Values.pvc }}
+volumeMounts:
+  {{- include "helpers.volume-mounts" . | nindent 2 }}
+{{- end }}
+*/}}
+{{- define "helpers.volume-mounts" -}}
+{{- range $pvcName, $pvc := . }}
+{{- range $mount := $pvc.mounts }}
+- name: {{ $pvcName }}
+  mountPath: {{ $mount.mountPath | quote }}
+  {{- if $mount.subPath }}
+  {{- if contains "$(" $mount.subPath }}
+  subPathExpr: {{ $mount.subPath | quote }}
+  {{- else }}
+  subPath: {{ $mount.subPath | quote }}
+  {{- end }}
+  {{- end }}
+  {{- if $mount.readOnly }}
+  readOnly: {{ $mount.readOnly }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Return the Volumes
+{{- with .Values.pvc }}
+volumes:
+  {{- include "helpers.volumes" (list $ .) | nindent 8 }}
+{{- end }}
+*/}}
+{{- define "helpers.volumes" -}}
+{{- $ := index . 0 }}
+{{- $fullName := include (printf "%s.fullname" $.Chart.Name) $ }}
+{{- with index . 1 }}
+{{- range $pvcName, $pvc := . }}
+- name: {{ $pvcName }}
+  {{- if .hostPath }}
+  hostPath:
+    {{- toYaml .hostPath | nindent 12 }}
+  {{- else if .emptyDir }}
+  emptyDir:
+    {{- toYaml .emptyDir | nindent 12 }}
+  {{- else if (dig "enabled" true $pvc) }}
+  persistentVolumeClaim:
+    claimName: {{ default (printf "%s-%s" $fullName $pvcName) .existingClaim }}
+  {{- else }}
+  emptyDir: {}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end -}}

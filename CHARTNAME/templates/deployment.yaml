@@ -40,11 +40,7 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          {{- if and .Values.global .Values.global.versions (index .Values.global.versions "CHARTNAME") }}
-          image: "{{ .Values.image.repository }}:{{ index .Values.global.versions "CHARTNAME" }}"
-          {{- else }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ include "helpers.image-tag" . }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             {{- include "helpers.list-env-variables" . | indent 12 }}
@@ -68,40 +64,11 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- with .Values.pvc }}
           volumeMounts:
-            {{- range $pvcName, $pvc := . }}
-            {{- range $mount := $pvc.mounts }}
-            - name: {{ $pvcName }}
-              mountPath: {{ $mount.mountPath | quote }}
-              {{- if $mount.subPath }}
-              {{- if contains "$(" $mount.subPath }}
-              subPathExpr: {{ $mount.subPath | quote }}
-              {{- else }}
-              subPath: {{ $mount.subPath | quote }}
-              {{- end }}
-              {{- end }}
-              {{- if $mount.readOnly }}
-              readOnly: {{ $mount.readOnly }}
-              {{- end }}
-            {{- end }}
-            {{- end }}
+            {{- include "helpers.volume-mounts" . | indent 12 }}
           {{- end }}
       {{- with .Values.pvc }}
       volumes:
-        {{- range $pvcName, $pvc := . }}
-        - name: {{ $pvcName }}
-          {{- if .hostPath }}
-          hostPath:
-            {{- toYaml .hostPath | nindent 12 }}
-          {{- else if .emptyDir }}
-          emptyDir:
-            {{- toYaml .emptyDir | nindent 12 }}
-          {{- else if (dig "enabled" true $pvc) }}
-          persistentVolumeClaim:
-            claimName: {{ default (printf "%s-%s" $fullName $pvcName) .existingClaim }}
-          {{- else }}
-          emptyDir: {}
-          {{- end }}
-        {{- end }}
+        {{- include "helpers.volumes" (list $ .) | indent 8 }}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
