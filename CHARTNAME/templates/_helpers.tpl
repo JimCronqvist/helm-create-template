@@ -112,7 +112,7 @@ Useage: {{ include "helpers.image-tag" }}
 Return the Volume Mounts
 {{- with .Values.pvc }}
 volumeMounts:
-  {{- include "helpers.volume-mounts" . | nindent 2 }}
+  {{- include "helpers.volume-mounts" . | indent 12 }}
 {{- end }}
 */}}
 {{- define "helpers.volume-mounts" -}}
@@ -138,7 +138,7 @@ volumeMounts:
 Return the Volumes
 {{- with .Values.pvc }}
 volumes:
-  {{- include "helpers.volumes" (list $ .) | nindent 8 }}
+  {{- include "helpers.volumes" (list $ .) | indent 8 }}
 {{- end }}
 */}}
 {{- define "helpers.volumes" -}}
