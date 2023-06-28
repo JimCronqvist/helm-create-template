@@ -6,7 +6,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ printf "%s-%s" $fullName ($job.name | replace " " "-") | trunc 53 | trimSuffix "-" }}
+  name: {{ printf "%s-%s" $fullName ($job.name | replace " " "-" | lower) | trunc 53 | trimSuffix "-" }}
   labels:
     {{- $labels | nindent 4 }}
   {{- with $job.annotations }}
