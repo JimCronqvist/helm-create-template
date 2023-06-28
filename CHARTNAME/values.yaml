@@ -114,6 +114,12 @@ probes:
   livenessPath: /health
   readinessPath: /health
 
+jobs: []
+  # - name: Bootstrap task
+  #   command: "date; echo Completed bootstrap task"
+  #   annotations: {}
+  #   #backoffLimit: 6
+
 cronjobs: []
   # - name: Cleanup task
   #   command: "date; echo Completed cleanup task"
