@@ -34,7 +34,7 @@ spec:
           securityContext:
             {{- toYaml $.Values.podSecurityContext | nindent 12 }}
           containers:
-            - name: {{ $cronjob.name | replace " " "-" }}
+            - name: {{ $cronjob.name | replace " " "-" | lower }}
               command:
                 - /bin/sh
                 - -c
