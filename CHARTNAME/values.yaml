@@ -18,7 +18,7 @@ image:
   tag: ""
 
 imagePullSecrets:
-  - name: github-docker-registry
+  - name: docker-image-pull-secret
 
 nameOverride: ""
 fullnameOverride: ""
@@ -45,7 +45,11 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
+deployment:
+  enabled: true
+
 service:
+  enabled: true
   type: ClusterIP
   port: 80
 
@@ -72,7 +76,6 @@ ingressroute:
     #   host: test(.*).local
     #   priority: 0
     #   stripPrefix: /base-path
-
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
