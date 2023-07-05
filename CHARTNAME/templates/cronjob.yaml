@@ -26,7 +26,7 @@ spec:
       template:
         metadata:
           annotations:
-            {{- include "CHARTNAME.checksumPodAnnotations" . | indent 12 }}
+            {{- include "CHARTNAME.checksumPodAnnotations" $ | indent 12 }}
         spec:
           restartPolicy: OnFailure
           {{- with $.Values.imagePullSecrets }}
