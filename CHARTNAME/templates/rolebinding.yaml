@@ -1,0 +1,16 @@
+{{- if and .Values.serviceAccount.create .Values.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: {{ .Values.rbac.kind | default "Role" }}Binding
+metadata:
+  name: {{ include "CHARTNAME.fullname" . }}
+  labels:
+    {{- include "CHARTNAME.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: {{ .Values.rbac.kind }}
+  name: {{ .Values.rbac.existingRole | default (include "CHARTNAME.fullname" .) }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "CHARTNAME.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+{{- end }}
