@@ -1,0 +1,12 @@
+{{- if and .Values.ingressroute.enabled .Values.ingressroute.responseHeaderMicroservice }}
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ include "CHARTNAME.fullname" . }}-header
+  labels:
+    {{- include "CHARTNAME.labels" . | nindent 4 }}
+spec:
+  headers:
+    customResponseHeaders:
+      X-Microservice: "{{ include "CHARTNAME.fullname" . }}"
+{{- end }}
