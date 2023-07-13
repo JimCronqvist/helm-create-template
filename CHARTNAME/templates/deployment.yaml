@@ -45,7 +45,7 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- with .Values.deployment.args }}
-          command:
+          args:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           securityContext:
